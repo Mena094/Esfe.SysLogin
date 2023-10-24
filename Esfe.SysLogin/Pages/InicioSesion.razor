@@ -1,0 +1,52 @@
+﻿@page "/"
+@inject NavigationManager NavigationManager
+@using Esfe.SysLogin.Data
+@using Esfe.SysLogin.Service
+@inject IUsuarioService service
+@using Esfe.SysLogin.Shared
+@inject UsuarioSesion sessionState
+
+
+@if (!isLoggedIn)
+{
+    <h3>Iniciar Sesión</h3>
+    <EditForm Model="usuario" OnValidSubmit="IniciarSesion">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group">
+                <label for="NameUser">Nombre de Usuario:</label>
+                <InputText id="NameUser" @bind-Value="usuario.nameUser" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label for="Password">Contraseña:</label>
+                <InputText id="Password" @bind-Value="usuario.password" class="form-control" type="password" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+        </EditForm>
+}
+@code {
+    private bool isLoggedIn = false;
+    private UsuarioData usuario = new UsuarioData(); // utilizar la clase de la carpeta Data como modelo del formulario
+    private async Task IniciarSesion()
+    {
+        try
+        {
+            var result = await service.IniciarSesion(usuario);
+            if(result != null)
+            {
+                sessionState.IsLoggedIn = true;
+                sessionState.User = result;
+                NavigationManager.NavigateTo("/Index"); // Cambia la ruta según tus necesidades
+
+            }
+        }
+        catch (Exception ex)
+        {
+            // mensajeError = ex.Message;
+        }
+    }
+
+}
